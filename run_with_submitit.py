@@ -11,13 +11,13 @@ import uuid
 from collections.abc import Iterable
 from pathlib import Path
 from typing import Dict
-
-os.environ["CUBLAS_WORKSPACE_CONFIG"] = ":4096:8"
 # import MLM_detection as mlm_detection
 import submitit
 
 import main as detection
 
+os.environ["CUBLAS_WORKSPACE_CONFIG"] = ":4096:8"
+_main_mdetr_dir = os.path.dirname(os.path.abspath(__file__))
 
 def parse_args():
     detection_parser = detection.get_args_parser()
@@ -34,9 +34,9 @@ def parse_args():
 
 def get_shared_folder(args) -> Path:
     user = os.getenv("USER")
-    if Path("/checkpoint/").is_dir():
-        p = Path(f"/checkpoint/{user}/experiments")
-        p.mkdir(exist_ok=True)
+    if Path(_main_mdetr_dir).is_dir():
+        p = Path(f"{_main_mdetr_dir}/{user}/experiments")
+        p.mkdir(exist_ok=True, parents=True)
         return p
     raise RuntimeError("No shared folder available")
 

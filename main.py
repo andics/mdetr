@@ -3,7 +3,7 @@
 import argparse
 import datetime
 import json
-import os
+import os, sys
 import random
 import time
 from collections import namedtuple
@@ -28,6 +28,22 @@ from engine import evaluate, train_one_epoch
 from models import build_model
 from models.postprocessors import build_postprocessors
 
+try:
+    path_main = str(Path(os.path.dirname(os.path.realpath(__file__))))
+    print(path_main)
+    sys.path.append(path_main)
+    os.chdir(path_main)
+    os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
+    os.environ["CUBLAS_WORKSPACE_CONFIG"] = ":4096:8"
+
+    os.environ["OMP_NUM_THREADS"] = "1"
+    os.environ["MKL_NUM_THREADS"] = "1"
+    torch.set_num_threads(1)
+
+    print("Environmental paths updated successfully!")
+    sys.path.remove('/workspace/object_detection')
+except Exception:
+    print("Tried to edit environmental paths but was unsuccessful!")
 
 def get_args_parser():
     parser = argparse.ArgumentParser("Set transformer detector", add_help=False)
@@ -277,6 +293,13 @@ def get_args_parser():
 
 
 def main(args):
+    # Used to fix Address already in use error
+
+    import subprocess
+    bash_command = "$kill $(ps aux | grep " + __file__ + " | grep -v grep | awk '{print $2}')"
+    process = subprocess.run(bash_command, shell=True)
+    print(f"Cleared past jobs from file {__file__}")
+
     # Init distributed mode
     dist.init_distributed_mode(args)
 
@@ -437,6 +460,10 @@ def main(args):
         if args.ema:
             model_ema = deepcopy(model_without_ddp)
 
+    if args.output_dir and utils.check_has_checkpoint(args.output_dir):
+        args.resume = utils.get_newest_pth_in_folder(args.output_dir)
+        print(f"Found existing .pth file in model output_dir: {args.resume}")
+
     # Used for loading weights from another model and starting a training from scratch. Especially useful if
     # loading into a model with different functionality.
     if args.load:
@@ -451,7 +478,9 @@ def main(args):
             model_ema = deepcopy(model_without_ddp)
 
     # Used for resuming training from the checkpoint of a model. Used when training times-out or is pre-empted.
+    print("Resume argument provided 1...")
     if args.resume:
+        print("Resume argument provided ...")
         if args.resume.startswith("https"):
             checkpoint = torch.hub.load_state_dict_from_url(args.resume, map_location="cpu", check_hash=True)
         else:

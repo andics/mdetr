@@ -7,6 +7,7 @@ Mostly copy-paste from torchvision references.
 """
 import os
 import subprocess
+import glob
 from typing import Any, Dict, List, Optional
 
 import torch
@@ -34,6 +35,26 @@ def get_sha():
     message = f"sha: {sha}, status: {diff}, branch: {branch}"
     return message
 
+def check_has_checkpoint(path_to_check):
+    save_file_folder = os.path.join(path_to_check)
+    if os.path.exists(save_file_folder):
+        if len(glob.glob1(save_file_folder, '*.pth')) > 0:
+            return True
+        else:
+            return False
+    else:
+        return False
+
+def get_newest_pth_in_folder(folder_path):
+    list_of_files = glob.glob(os.path.join(folder_path, '*.pth'))  # get list of all .pth files
+    list_of_files = [file for file in list_of_files if 'BEST_checkpoint.pth' not in file]  # exclude 'BEST_checkpoint.pth' files
+
+    if not list_of_files:  # if the list is empty, return None
+        return None
+
+    newest_file = max(list_of_files, key=os.path.getctime)  # find the newest file (with the highest creation time)
+
+    return newest_file
 
 def collate_fn(do_round, batch):
     batch = list(zip(*batch))

@@ -7,6 +7,7 @@ import math
 import sys
 from typing import Dict, Iterable, Optional
 
+import cv2
 import torch
 import torch.nn
 import torch.optim
@@ -51,6 +52,7 @@ def train_one_epoch(
     print_freq = 10
 
     num_training_steps = int(len(data_loader) * args.epochs)
+    #---HERE---
     for i, batch_dict in enumerate(metric_logger.log_every(data_loader, print_freq, header)):
         curr_step = epoch * len(data_loader) + i
         samples = batch_dict["samples"].to(device)
