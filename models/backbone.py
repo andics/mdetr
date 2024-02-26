@@ -217,7 +217,7 @@ def build_backbone(args):
     elif args.backbone in ("resnet50-gn", "resnet101-gn"):
         backbone = GroupNormBackbone(args.backbone, train_backbone, return_interm_layers, args.dilation)
     else:
-        backbone = Backbone(args.backbone, train_backbone, return_interm_layers, args.dilation)
+        backbone = Backbone(args.backbone, train_backbone, return_interm_layers, args.dilation, args.local_path)
     model = Joiner(backbone, position_embedding)
     model.num_channels = backbone.num_channels
     return model
