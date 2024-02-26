@@ -132,6 +132,12 @@ def get_args_parser():
         choices=("roberta-base", "distilroberta-base", "roberta-large"),
     )
 
+    #---
+    parser.add_argument('--local_path', default='', type=str,
+                        help="Whether to load a backbone from a local .pth file."
+                        "If desired, provide a with full .pth/.pth.tar path")
+    #---
+
     # Backbone
     parser.add_argument(
         "--backbone",

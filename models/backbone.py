@@ -82,10 +82,36 @@ class BackboneBase(nn.Module):
 class Backbone(BackboneBase):
     """ResNet backbone with frozen BatchNorm."""
 
-    def __init__(self, name: str, train_backbone: bool, return_interm_layers: bool, dilation: bool):
-        backbone = getattr(torchvision.models, name)(
-            replace_stride_with_dilation=[False, False, dilation], pretrained=True, norm_layer=FrozenBatchNorm2d
-        )
+    def __init__(self, name: str,
+                 train_backbone: bool,
+                 return_interm_layers: bool,
+                 dilation: bool,
+                 local_path: str = ''):
+
+        #---
+        if local_path:
+            backbone_weights = torch.load(local_path, map_location=torch.device('cpu'))["state_dict"]
+            backbone = getattr(torchvision.models, name)(
+                replace_stride_with_dilation=[False, False, dilation],
+                pretrained=False, norm_layer=FrozenBatchNorm2d)
+
+            # Load the state_dict from the backbone dictionary, handling the multi-GPU case
+            state_dict = OrderedDict()
+            for k, v in backbone_weights.items():
+                if "module" in k:
+                    k_n = k.replace("module.", "")
+                    state_dict[k_n] = v
+                else:
+                    break
+
+            # Load the modified state_dict
+            backbone.load_state_dict(state_dict)
+        else:
+            backbone = getattr(torchvision.models, name)(
+                replace_stride_with_dilation=[False, False, dilation], pretrained=True, norm_layer=FrozenBatchNorm2d
+            )
+        #---
+
         num_channels = 512 if name in ("resnet18", "resnet34") else 2048
         super().__init__(backbone, train_backbone, num_channels, return_interm_layers)
 
