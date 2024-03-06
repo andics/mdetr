@@ -472,6 +472,10 @@ def main(args):
         args.load = ""
         print(f"Setting args.load to empty string to avoid loading from different modality model")
 
+    if args.output_dir and (not utils.check_has_checkpoint(args.output_dir)):
+        print(f"No existing .pth file in model output_dir: {args.output_dir}")
+        print(f"Leaving args.resume and args.load unchanged")
+
     # Used for loading weights from another model and starting a training from scratch. Especially useful if
     # loading into a model with different functionality.
     if args.load:
