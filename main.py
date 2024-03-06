@@ -135,7 +135,9 @@ def get_args_parser():
     #---
     parser.add_argument('--local_path', default='', type=str,
                         help="Whether to load a backbone from a local .pth file."
-                        "If desired, provide a with full .pth/.pth.tar path")
+                        "If desired, provide a with full .pth/.pth.tar path"
+                        "Note that if load or resume is provided, the weights of the"
+                        "backbone (this argument) will be over-ridden.")
     #---
 
     # Backbone
