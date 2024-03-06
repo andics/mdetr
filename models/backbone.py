@@ -90,6 +90,7 @@ class Backbone(BackboneBase):
 
         #---
         if local_path:
+            print("Loading custom provided backbone weights from: ", local_path)
             backbone_weights = torch.load(local_path, map_location=torch.device('cpu'))["state_dict"]
             backbone = getattr(torchvision.models, name)(
                 replace_stride_with_dilation=[False, False, dilation],

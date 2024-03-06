@@ -469,11 +469,13 @@ def main(args):
     if args.output_dir and utils.check_has_checkpoint(args.output_dir):
         args.resume = utils.get_newest_pth_in_folder(args.output_dir)
         print(f"Found existing .pth file in model output_dir: {args.resume}")
+        args.load = ""
+        print(f"Setting args.load to empty string to avoid loading from different modality model")
 
     # Used for loading weights from another model and starting a training from scratch. Especially useful if
     # loading into a model with different functionality.
     if args.load:
-        print("loading from", args.load)
+        print("args.load: loading from", args.load)
         checkpoint = torch.load(args.load, map_location="cpu")
         if "model_ema" in checkpoint:
             model_without_ddp.load_state_dict(checkpoint["model_ema"], strict=False)
@@ -484,9 +486,8 @@ def main(args):
             model_ema = deepcopy(model_without_ddp)
 
     # Used for resuming training from the checkpoint of a model. Used when training times-out or is pre-empted.
-    print("Resume argument provided 1...")
     if args.resume:
-        print("Resume argument provided ...")
+        print("args.resume: resume argument provided ...", args.resume)
         if args.resume.startswith("https"):
             checkpoint = torch.hub.load_state_dict_from_url(args.resume, map_location="cpu", check_hash=True)
         else:
