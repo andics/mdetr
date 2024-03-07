@@ -16,8 +16,10 @@ def plot_metric_from_logs(storage_dir, epoch, metric_to_plot):
             parts = item.split("_")
             if len(parts) < 4:  # Ensure the folder name has the expected parts
                 continue
-            checkpoint_number = parts[2]
-            category = parts[3]
+            checkpoint_number = parts[1]
+            # Extract only the digits from the checkpoint_number string
+            checkpoint_number = ''.join(filter(str.isdigit, checkpoint_number))
+            category = parts[2]
             # Ensure category is one of the expected values
             if category not in metric_values:
                 continue
@@ -34,16 +36,16 @@ def plot_metric_from_logs(storage_dir, epoch, metric_to_plot):
                             data = json.loads(lines[epoch - 1])  # epochs are 1-indexed in this context
                             # Extract the specified metric
                             if metric_to_plot in data:
-                                metric_values[category].append(data[metric_to_plot])
-                                checkpoint_numbers.append(int(checkpoint_number))
+                                metric_values[category].append(tuple([int(checkpoint_number),
+                                                                     data[metric_to_plot]]))
                     except json.JSONDecodeError:
                         print(f"Error decoding JSON from file {log_path}")
 
     # After collecting all data, plot it
-    for category, values in metric_values.items():
-        if values:  # Check if there are any values to plot for this category
-            # Ensure there's a one-to-one mapping between checkpoints and metric values
-            plt.plot(sorted(checkpoint_numbers), [y for _, y in sorted(zip(checkpoint_numbers, values))], label=category)
+    for category, checkpoints_and_metrics in metric_values.items():
+        # Unzipping the list of (x, y) tuples into two lists for plotting
+        x_values, y_values = zip(*checkpoints_and_metrics)
+        plt.plot(x_values, y_values, marker='o', label=category)
 
     plt.xlabel("Checkpoint Number")
     plt.ylabel(metric_to_plot)
@@ -53,7 +55,7 @@ def plot_metric_from_logs(storage_dir, epoch, metric_to_plot):
 
 # Example usage:
 storage_dir = "/home/projects/bagon/andreyg/Projects/Variable_Resolution_VQA/Programming/mdetr/trained_models"
-epoch = 1  # Assuming we're interested in the 3rd epoch
+epoch = 3  # Assuming we're interested in the 3rd epoch
 metric_to_plot = "test_gqa_accuracy_answer_total_unscaled"
 
 plot_metric_from_logs(storage_dir, epoch, metric_to_plot)
