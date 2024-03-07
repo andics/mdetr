@@ -54,10 +54,10 @@ def plot_metric_from_logs(storage_dir, epoch, metric_to_plot):
     plt.show()
 
 # Example usage:
-storage_dir = "/home/projects/bagon/andreyg/Projects/Variable_Resolution_VQA/Programming/mdetr/trained_models"
-epoch = 3  # Assuming we're interested in the 3rd epoch
-metric_to_plot = "test_gqa_accuracy_answer_total_unscaled"
-
+storage_dir = "Q:/Projects/Variable_resolution/Programming/mdetr/trained_models"
+epoch = 7  # Assuming we're interested in the 3rd epoch
+#metric_to_plot = "test_gqa_accuracy_answer_total_unscaled"
+metric_to_plot = "test_gqa_accuracy_answer_rel_unscaled"
 plot_metric_from_logs(storage_dir, epoch, metric_to_plot)
 
 # Since the code requires access to the filesystem to retrieve and parse the files,
