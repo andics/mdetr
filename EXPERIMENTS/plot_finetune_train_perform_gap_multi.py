@@ -26,9 +26,9 @@ def plot_metric_from_logs(storage_dir, pretrain_epoch, save_dir):
             if os.path.exists(log_path):
                 with open(log_path, 'r') as file:
                     lines = file.readlines()
-                    data = json.loads(lines)
-                    for finetuning_epoch_metrics_dict, finetuning_epoch_number in enumerate(data):
-                        for key, value in finetuning_epoch_metrics_dict.items():
+                    for finetuning_epoch_number, finetuning_epoch_metrics_dict in enumerate(lines):
+                        data = json.loads(finetuning_epoch_metrics_dict)
+                        for key, value in data.items():
                             if key.startswith("test_gqa_accuracy_"):
                                 if key not in metric_values:
                                     metric_values[key] = {cat: [] for cat in categories}
@@ -46,8 +46,8 @@ def plot_metric_from_logs(storage_dir, pretrain_epoch, save_dir):
         #Metric name is too long, so we need to split it
         metric_name_for_display = "_".join(metric.split("_")[3:])
 
-        axs[i].set_title(f"Num pretrain epochs: x-axis; Num GQA finetuning epochs: {pretrain_epoch}; GQA eval metric: y-axis")
-        axs[i].set_xlabel("Num pretrain epochs")
+        axs[i].set_title(f"Num pretrain epochs: {pretrain_epoch}; Num GQA finetuning epochs: x-axis; GQA eval metric: y-axis")
+        axs[i].set_xlabel("Num finetuning epochs")
         axs[i].set_ylabel(f"{metric_name_for_display} after {pretrain_epoch} GQA finetuning epochs")
         axs[i].legend()
 
