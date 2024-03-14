@@ -64,7 +64,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Plot metrics from training logs.")
     parser.add_argument('--storage_dir', type=str, required=True,
                         help="Directory where 'finetuned_' folders are located")
-    parser.add_argument('--epoch', type=int, required=True, help="Epoch to extract metrics from")
+    parser.add_argument('--epoch', type=int, required=True, help="Finetuning epoch to extract metrics from")
     parser.add_argument('--save_dir', type=str, help="Path to save the plot to")
 
     args = parser.parse_args()
