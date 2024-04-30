@@ -1,0 +1,3 @@
+Bascially, for ECCV we trained for 35 epochs with a LR decrease between 30 and 35
+This is problematic becuase of the LR decrease. Thus, I am removing
+checkpints after 30 to resume from 29 with normal LR.
